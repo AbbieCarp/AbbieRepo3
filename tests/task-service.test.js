@@ -199,3 +199,114 @@ test('deleteTask throws NotFoundError for unknown id', () => {
     NotFoundError
   );
 });
+
+// ── additional service coverage ───────────────────────────────────────────────
+
+test('createTask throws ValidationError for missing title', () => {
+  const service = new TaskService();
+  assert.throws(() => service.createTask({}), ValidationError);
+});
+
+test('createTask throws ValidationError for empty title', () => {
+  const service = new TaskService();
+  assert.throws(() => service.createTask({ title: '   ' }), ValidationError);
+});
+
+test('listTasks returns empty array when no tasks exist', () => {
+  const service = new TaskService();
+  assert.deepEqual(service.listTasks(), []);
+});
+
+test('listTasks returns shallow copies (mutation does not affect store)', () => {
+  const ids = ['ee111111-1111-4111-8111-111111111111'];
+  let i = 0;
+  const service = new TaskService({
+    idGenerator: () => ids[i++],
+    timeProvider: () => '2026-03-31T18:00:00.000Z'
+  });
+
+  service.createTask({ title: 'Original' });
+  const [copy] = service.listTasks();
+  copy.title = 'Mutated';
+
+  assert.equal(service.listTasks()[0].title, 'Original');
+});
+
+test('listTasks sorts by priority descending', () => {
+  const ids = [
+    '0a111111-1111-4111-8111-111111111111',
+    '0a222222-2222-4222-8222-222222222222',
+    '0a333333-3333-4333-8333-333333333333'
+  ];
+  let i = 0;
+  const service = new TaskService({
+    idGenerator: () => ids[i++],
+    timeProvider: () => '2026-03-31T16:00:00.000Z'
+  });
+
+  service.createTask({ title: 'Low',    priority: 'low'    });
+  service.createTask({ title: 'High',   priority: 'high'   });
+  service.createTask({ title: 'Medium', priority: 'medium' });
+
+  const sorted = service.listTasks({ sortBy: 'priority', order: 'desc' });
+  assert.deepEqual(sorted.map((t) => t.title), ['High', 'Medium', 'Low']);
+});
+
+test('listTasks sorts by createdAt ascending', () => {
+  const ids = [
+    '0b111111-1111-4111-8111-111111111111',
+    '0b222222-2222-4222-8222-222222222222'
+  ];
+  let i = 0;
+  const service = new TaskService({
+    idGenerator: () => ids[i++],
+    timeProvider: makeTimeProvider([
+      '2026-03-31T17:00:00.000Z',
+      '2026-03-31T17:10:00.000Z'
+    ])
+  });
+
+  service.createTask({ title: 'Older' });
+  service.createTask({ title: 'Newer' });
+
+  const sorted = service.listTasks({ sortBy: 'createdAt', order: 'asc' });
+  assert.deepEqual(sorted.map((t) => t.title), ['Older', 'Newer']);
+});
+
+test('listTasks throws ValidationError for invalid query', () => {
+  const service = new TaskService();
+  assert.throws(() => service.listTasks({ sortBy: 'name' }), ValidationError);
+});
+
+test('updateTask throws ValidationError for empty updates object', () => {
+  const ids = ['0c111111-1111-4111-8111-111111111111'];
+  let i = 0;
+  const service = new TaskService({
+    idGenerator: () => ids[i++],
+    timeProvider: () => '2026-03-31T19:00:00.000Z'
+  });
+
+  const created = service.createTask({ title: 'Stable' });
+  assert.throws(() => service.updateTask(created.id, {}), ValidationError);
+});
+
+test('deleteTask removes only the targeted task', () => {
+  const ids = [
+    '0d111111-1111-4111-8111-111111111111',
+    '0d222222-2222-4222-8222-222222222222'
+  ];
+  let i = 0;
+  const service = new TaskService({
+    idGenerator: () => ids[i++],
+    timeProvider: () => '2026-03-31T20:00:00.000Z'
+  });
+
+  const a = service.createTask({ title: 'Keep'   });
+  const b = service.createTask({ title: 'Delete' });
+
+  service.deleteTask(b.id);
+
+  const remaining = service.listTasks();
+  assert.equal(remaining.length, 1);
+  assert.equal(remaining[0].id, a.id);
+});

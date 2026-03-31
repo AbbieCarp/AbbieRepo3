@@ -8,6 +8,8 @@ import {
   validateId,
   validateIsoTimestamp,
   validateListTaskQuery,
+  validatePriority,
+  validateStatus,
   validateTask,
   validateTitle,
   validateUpdateTaskInput
@@ -92,6 +94,134 @@ test('validateTask rejects updatedAt before createdAt', () => {
         priority: 'medium',
         createdAt: '2026-03-31T12:00:01.000Z',
         updatedAt: '2026-03-31T12:00:00.000Z'
+      }),
+    ValidationError
+  );
+});
+
+// ── validateStatus ───────────────────────────────────────────────────────────
+
+test('validateStatus accepts all valid enum values', () => {
+  assert.doesNotThrow(() => validateStatus('todo'));
+  assert.doesNotThrow(() => validateStatus('in-progress'));
+  assert.doesNotThrow(() => validateStatus('done'));
+});
+
+test('validateStatus rejects an invalid string', () => {
+  assert.throws(() => validateStatus('pending'),  ValidationError);
+  assert.throws(() => validateStatus('DONE'),     ValidationError);
+});
+
+test('validateStatus rejects a non-string value', () => {
+  assert.throws(() => validateStatus(1), ValidationError);
+});
+
+// ── validatePriority ─────────────────────────────────────────────────────────
+
+test('validatePriority accepts all valid enum values', () => {
+  assert.doesNotThrow(() => validatePriority('low'));
+  assert.doesNotThrow(() => validatePriority('medium'));
+  assert.doesNotThrow(() => validatePriority('high'));
+});
+
+test('validatePriority rejects an invalid string', () => {
+  assert.throws(() => validatePriority('urgent'), ValidationError);
+  assert.throws(() => validatePriority('HIGH'),   ValidationError);
+});
+
+test('validatePriority rejects a non-string value', () => {
+  assert.throws(() => validatePriority(true), ValidationError);
+});
+
+// ── validateTitle (extra edge cases) ─────────────────────────────────────────
+
+test('validateTitle rejects non-string input', () => {
+  assert.throws(() => validateTitle(42),   ValidationError);
+  assert.throws(() => validateTitle(null), ValidationError);
+});
+
+test('validateTitle rejects a title longer than 120 characters', () => {
+  assert.throws(() => validateTitle('a'.repeat(121)), ValidationError);
+});
+
+test('validateTitle accepts a title of exactly 120 characters', () => {
+  assert.doesNotThrow(() => validateTitle('a'.repeat(120)));
+});
+
+test('validateTitle accepts a title of exactly 1 character', () => {
+  assert.doesNotThrow(() => validateTitle('x'));
+});
+
+test('validateTitle throws for undefined when not optional', () => {
+  assert.throws(() => validateTitle(undefined), ValidationError);
+});
+
+// ── validateId (extra edge cases) ────────────────────────────────────────────
+
+test('validateId rejects an empty string', () => {
+  assert.throws(() => validateId(''), ValidationError);
+});
+
+test('validateId rejects a whitespace-only string', () => {
+  assert.throws(() => validateId('   '), ValidationError);
+});
+
+test('validateId rejects non-string values', () => {
+  assert.throws(() => validateId(123),  ValidationError);
+  assert.throws(() => validateId(null), ValidationError);
+});
+
+// ── validateListTaskQuery (extra cases) ──────────────────────────────────────
+
+test('validateListTaskQuery accepts an empty query object', () => {
+  assert.doesNotThrow(() => validateListTaskQuery({}));
+});
+
+test('validateListTaskQuery accepts a full valid query', () => {
+  assert.doesNotThrow(() =>
+    validateListTaskQuery({
+      status:   'in-progress',
+      priority: 'high',
+      sortBy:   'createdAt',
+      order:    'asc'
+    })
+  );
+});
+
+test('validateListTaskQuery rejects an invalid order value', () => {
+  assert.throws(() => validateListTaskQuery({ order: 'random' }), ValidationError);
+});
+
+// ── validateUpdateTaskInput (extra cases) ────────────────────────────────────
+
+test('validateUpdateTaskInput rejects unknown fields', () => {
+  assert.throws(
+    () => validateUpdateTaskInput({ title: 'X', unknownField: true }),
+    ValidationError
+  );
+});
+
+test('validateUpdateTaskInput rejects invalid status value', () => {
+  assert.throws(
+    () => validateUpdateTaskInput({ status: 'pending' }),
+    ValidationError
+  );
+});
+
+// ── validateTask (extra cases) ───────────────────────────────────────────────
+
+test('validateTask rejects unknown fields', () => {
+  assert.throws(
+    () =>
+      validateTask({
+        id:          '66666666-6666-4666-8666-666666666666',
+        title:       'Task',
+        description: '',
+        status:      'todo',
+        priority:    'medium',
+        createdAt:   '2026-03-31T12:00:00.000Z',
+        updatedAt:   '2026-03-31T12:00:00.000Z',
+        extra:       true
       }),
     ValidationError
   );
