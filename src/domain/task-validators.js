@@ -12,12 +12,13 @@ const UUID_V4_REGEX =
  */
 export function validateCreateTaskInput(input) {
   assertObject(input, 'Create input must be an object.');
-  rejectUnknownFields(input, ['title', 'description', 'status', 'priority']);
+  rejectUnknownFields(input, ['title', 'description', 'status', 'priority', 'category']);
 
   validateTitle(input.title);
   validateDescription(input.description);
   validateStatus(input.status);
   validatePriority(input.priority);
+  validateCategory(input.category);
 }
 
 /**
@@ -27,7 +28,7 @@ export function validateCreateTaskInput(input) {
  */
 export function validateUpdateTaskInput(input) {
   assertObject(input, 'Update input must be an object.');
-  rejectUnknownFields(input, ['title', 'description', 'status', 'priority']);
+  rejectUnknownFields(input, ['title', 'description', 'status', 'priority', 'category']);
 
   if (Object.keys(input).length === 0) {
     throw new ValidationError('Update input must include at least one field.');
@@ -37,6 +38,7 @@ export function validateUpdateTaskInput(input) {
   validateDescription(input.description, true);
   validateStatus(input.status, true);
   validatePriority(input.priority, true);
+  validateCategory(input.category, true);
 }
 
 /**
@@ -46,10 +48,11 @@ export function validateUpdateTaskInput(input) {
  */
 export function validateListTaskQuery(query) {
   assertObject(query, 'List query must be an object.');
-  rejectUnknownFields(query, ['status', 'priority', 'sortBy', 'order']);
+  rejectUnknownFields(query, ['status', 'priority', 'category', 'sortBy', 'order']);
 
   validateStatus(query.status, true);
   validatePriority(query.priority, true);
+  validateCategory(query.category, true);
 
   if (query.sortBy !== undefined && !['priority', 'createdAt'].includes(query.sortBy)) {
     throw new ValidationError("sortBy must be 'priority' or 'createdAt'.");
@@ -73,6 +76,7 @@ export function validateTask(task) {
     'description',
     'status',
     'priority',
+    'category',
     'createdAt',
     'updatedAt'
   ]);
@@ -82,6 +86,7 @@ export function validateTask(task) {
   validateDescription(task.description);
   validateStatus(task.status);
   validatePriority(task.priority);
+  validateCategory(task.category);
   validateIsoTimestamp(task.createdAt, 'createdAt');
   validateIsoTimestamp(task.updatedAt, 'updatedAt');
 
@@ -172,6 +177,31 @@ export function validatePriority(value, optional = false) {
 
   if (typeof value !== 'string' || !TASK_PRIORITIES.includes(value)) {
     throw new ValidationError("priority must be one of: 'low', 'medium', 'high'.");
+  }
+}
+
+/**
+ * Validate task category string.
+ *
+ * @param {unknown} value
+ * @param {boolean} [optional=false]
+ */
+export function validateCategory(value, optional = false) {
+  if (value === undefined && optional) {
+    return;
+  }
+
+  if (value === undefined) {
+    return;
+  }
+
+  if (typeof value !== 'string') {
+    throw new ValidationError('category must be a string.');
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.length < 1 || trimmed.length > 100) {
+    throw new ValidationError('category length must be between 1 and 100 characters.');
   }
 }
 

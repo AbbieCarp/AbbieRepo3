@@ -11,7 +11,7 @@ export { TASK_STATUSES, TASK_PRIORITIES, PRIORITY_RANK };
  */
 export class Task {
   /**
-   * @param {{ title: string, description?: string, status?: string, priority?: string }} input
+   * @param {{ title: string, description?: string, status?: string, priority?: string, category?: string }} input
    */
   constructor(input) {
     validateCreateTaskInput(input);
@@ -42,6 +42,7 @@ export class Task {
       description: this.description,
       status: this.status,
       priority: this.priority,
+      category: this.category,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };

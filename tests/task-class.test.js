@@ -63,13 +63,13 @@ test('Task constructor throws ValidationError for unknown fields', () => {
 
 // ── toObject() ───────────────────────────────────────────────────────────────
 
-test('toObject() returns a plain object with all seven fields', () => {
+test('toObject() returns a plain object with all eight fields', () => {
   const task = new Task({ title: 'Export me' });
   const obj  = task.toObject();
 
   assert.ok(!(obj instanceof Task));
   assert.deepEqual(Object.keys(obj).sort(), [
-    'createdAt', 'description', 'id', 'priority', 'status', 'title', 'updatedAt'
+    'category', 'createdAt', 'description', 'id', 'priority', 'status', 'title', 'updatedAt'
   ]);
 });
 

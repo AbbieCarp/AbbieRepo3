@@ -18,6 +18,7 @@
 | `description` | `string` | No | `''` | Max length `500` |
 | `status` | `TaskStatus` | No | `'todo'` | Must match enum |
 | `priority` | `TaskPriority` | No | `'medium'` | Must match enum |
+| `category` | `string` | No | `'general'` | Trimmed length `1..100` |
 | `createdAt` | `string` | Yes | `new Date().toISOString()` | ISO 8601 timestamp |
 | `updatedAt` | `string` | Yes | `new Date().toISOString()` | ISO 8601 timestamp; updated on successful mutation |
 
@@ -51,6 +52,14 @@
   - Allowed values: `'low'`, `'medium'`, `'high'`.
   - Defaults to `'medium'` on create when omitted.
 
+- `category`
+  - Type must be `string` when provided.
+  - Defaults to `'general'` on create when omitted.
+  - Value is trimmed before validation and storage.
+  - Trimmed length must be between `1` and `100` characters.
+  - Can contain alphanumeric characters, spaces, hyphens, and underscores.
+  - No specific format constraints; any category string is allowed.
+
 - `createdAt`
   - Type must be `string`.
   - Must be a valid ISO 8601 UTC timestamp (`Date.parse(value)` is not `NaN`).
@@ -72,6 +81,7 @@
 | `description` | `string` | No | Max length `500` |
 | `status` | `TaskStatus` | No | Defaults to `'todo'` |
 | `priority` | `TaskPriority` | No | Defaults to `'medium'` |
+| `category` | `string` | No | Defaults to `'general'`; trimmed length `1..100` |
 
 #### UpdateTaskInput
 
@@ -82,6 +92,7 @@
 | `description` | `string` | No | If present, max length `500` |
 | `status` | `TaskStatus` | No | Must match enum |
 | `priority` | `TaskPriority` | No | Must match enum |
+| `category` | `string` | No | If present, trimmed length `1..100` |
 
 Validation behavior:
 - Reject unknown fields.
@@ -100,6 +111,7 @@ Validation behavior:
 |---|---|---|---|---|
 | `status` | `TaskStatus` | No | `undefined` | Filter by status |
 | `priority` | `TaskPriority` | No | `undefined` | Filter by priority |
+| `category` | `string` | No | `undefined` | Filter by category |
 | `sortBy` | `SortBy` | No | `undefined` | `priority` or `createdAt` |
 | `order` | `SortOrder` | No | Contextual | For `createdAt`: `desc`; for `priority`: `asc` |
 

@@ -38,6 +38,20 @@ The Task Manager CLI is a Node.js 20+ command-line application for managing pers
    - When I sort by creation date, then order can be newest-first or oldest-first based on an option.
    - When sorting is requested, then output order is deterministic for tasks with equal values.
 
+7. As a user, I want to organize tasks by category so I can group related work items.
+   - Acceptance criteria:
+   - Given a category name when I create a task, then the task is assigned that category.
+   - Given no category when I create a task, then the category defaults to "general".
+   - When I update a task, then I can change its category to any string value or keep the existing value.
+   - When I filter by category, then only tasks with that category are shown.
+   - When I request a list of all categories, then all unique category values present in tasks are returned.
+
+8. As a user, I want to filter tasks by category so I can focus on specific groups of work.
+   - Acceptance criteria:
+   - When I pass --category with a valid category value, then only tasks with that category are shown.
+   - When multiple tasks share a category, then all matching tasks are displayed.
+   - When no tasks have the requested category, then the CLI shows an empty-state message.
+
 ## 3. Data Model
 - Entity: Task
   - id: string
@@ -45,12 +59,14 @@ The Task Manager CLI is a Node.js 20+ command-line application for managing pers
   - description: string (optional, default "")
   - status: "todo" | "in-progress" | "done"
   - priority: "low" | "medium" | "high"
+  - category: string (optional, default "general")
   - createdAt: string (ISO 8601 timestamp)
   - updatedAt: string (ISO 8601 timestamp)
 
 - Entity: TaskFilterOptions
   - status: "todo" | "in-progress" | "done" | undefined
   - priority: "low" | "medium" | "high" | undefined
+  - category: string | undefined
 
 - Entity: TaskSortOptions
   - sortBy: "priority" | "createdAt" | undefined
@@ -134,11 +150,18 @@ src/
 - `priority`
    - Allowed values: `low`, `medium`, `high`.
    - Defaults to `medium` on create if omitted.
+- `category`
+   - Optional.
+   - Defaults to `general` on create if omitted.
+   - Must be a string if provided.
+   - Trimmed length must be 1-100 characters.
+   - Used for organizing and filtering task groups.
 - `id`
    - Required for update/delete.
    - Must be a non-empty string and match an existing task.
 - Filters and sorting
    - `--status` and `--priority` must use allowed enum values.
+   - `--category` must be a non-empty string matching an existing task's category.
    - `--sortBy` must be `priority` or `createdAt`.
    - `--order` must be `asc` or `desc`; default to `desc` for `createdAt` and `asc` for `priority`.
 - Unknown fields or duplicate flags

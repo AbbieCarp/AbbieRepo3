@@ -25,7 +25,7 @@ export class TaskService {
   /**
    * Create and store a new task.
    *
-   * @param {{ title: string, description?: string, status?: string, priority?: string }} input
+   * @param {{ title: string, description?: string, status?: string, priority?: string, category?: string }} input
    * @returns {object}
    */
   createTask(input) {
@@ -48,7 +48,7 @@ export class TaskService {
   /**
    * List tasks with optional filtering and sorting.
    *
-   * @param {{ status?: string, priority?: string, sortBy?: string, order?: string }} [query]
+   * @param {{ status?: string, priority?: string, category?: string, sortBy?: string, order?: string }} [query]
    * @returns {object[]}
    */
   listTasks(query = {}) {
@@ -62,6 +62,10 @@ export class TaskService {
 
     if (query.priority) {
       results = results.filter((task) => task.priority === query.priority);
+    }
+
+    if (query.category) {
+      results = results.filter((task) => task.category === query.category);
     }
 
     const sortBy = query.sortBy;
@@ -88,7 +92,7 @@ export class TaskService {
    * Update an existing task atomically.
    *
    * @param {string} id
-   * @param {{ title?: string, description?: string, status?: string, priority?: string }} updates
+   * @param {{ title?: string, description?: string, status?: string, priority?: string, category?: string }} updates
    * @returns {object}
    */
   updateTask(id, updates) {
@@ -107,6 +111,7 @@ export class TaskService {
       title: updates.title !== undefined ? updates.title.trim() : current.title,
       description:
         updates.description !== undefined ? updates.description.trim() : current.description,
+      category: updates.category !== undefined ? updates.category.trim() : current.category,
       updatedAt: this.timeProvider()
     };
 
@@ -129,5 +134,25 @@ export class TaskService {
     }
 
     this.tasks.splice(index, 1);
+  }
+
+  /**
+   * Filter tasks by category.
+   *
+   * @param {string} category
+   * @returns {object[]}
+   */
+  filterTasksByCategory(category) {
+    return this.listTasks({ category });
+  }
+
+  /**
+   * List all unique categories in the task store.
+   *
+   * @returns {string[]}
+   */
+  listUniqueCategories() {
+    const categories = new Set(this.tasks.map((task) => task.category));
+    return Array.from(categories).sort();
   }
 }

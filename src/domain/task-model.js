@@ -10,7 +10,7 @@ export const PRIORITY_RANK = {
 /**
  * Build a normalized task object with generated metadata.
  *
- * @param {{ title: string, description?: string, status?: string, priority?: string }} input
+ * @param {{ title: string, description?: string, status?: string, priority?: string, category?: string }} input
  * @param {{ id: string, timestamp: string }} meta
  * @returns {{
  *   id: string,
@@ -18,6 +18,7 @@ export const PRIORITY_RANK = {
  *   description: string,
  *   status: string,
  *   priority: string,
+ *   category: string,
  *   createdAt: string,
  *   updatedAt: string
  * }}
@@ -29,6 +30,7 @@ export function buildTask(input, meta) {
     description: (input.description ?? '').trim(),
     status: input.status ?? 'todo',
     priority: input.priority ?? 'medium',
+    category: (input.category ?? 'general').trim(),
     createdAt: meta.timestamp,
     updatedAt: meta.timestamp
   };

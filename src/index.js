@@ -104,3 +104,44 @@ console.log(`Deleted task id: ${t2.id}`);
 
 console.log('\n=== REMAINING TASKS ===');
 service.listTasks().forEach((t) => console.log(`  ${t.title}`));
+
+// ── CATEGORY FEATURE ──────────────────────────────────────────────────────────
+
+console.log('\n=== CATEGORY FEATURE ===');
+
+// Create tasks with different categories
+const c1 = service.createTask({
+  title: 'Deploy to production',
+  category: 'devops',
+  priority: 'high'
+});
+console.log('Created with category "devops":', { title: c1.title, category: c1.category });
+
+const c2 = service.createTask({
+  title: 'Review code changes',
+  category: 'code-review',
+  priority: 'medium'
+});
+console.log('Created with category "code-review":', { title: c2.title, category: c2.category });
+
+const c3 = service.createTask({
+  title: 'Update documentation',
+  category: 'documentation',
+  priority: 'low'
+});
+console.log('Created with category "documentation":', { title: c3.title, category: c3.category });
+
+// List unique categories
+console.log('\n=== ALL UNIQUE CATEGORIES ===');
+const categories = service.listUniqueCategories();
+console.log('Unique categories:', categories);
+
+// Filter tasks by category
+console.log('\n=== FILTER BY CATEGORY: devops ===');
+const devopsTasks = service.filterTasksByCategory('devops');
+devopsTasks.forEach((t) => console.log(`  [${t.priority}] ${t.title}`));
+
+console.log('\n=== FILTER BY CATEGORY: general ===');
+const generalTasks = service.filterTasksByCategory('general');
+console.log(`Found ${generalTasks.length} tasks in "general" category`);
+
