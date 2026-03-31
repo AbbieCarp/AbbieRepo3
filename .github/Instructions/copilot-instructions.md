@@ -29,3 +29,8 @@
 - Use the built-in Node.js `assert` module.
 - Test files end with `.test.js`.
 - Each test function tests exactly one behavior.
+
+## Dependencies
+
+- Do not add external dependencies.
+- Use only built-in Node.js modules (fs, path, assert, crypto, etc.).
