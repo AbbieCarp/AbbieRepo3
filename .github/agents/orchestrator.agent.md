@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Coordinates the full SDLC workflow for new features using the planner, architect, developer, and tester agents
-tools: ["edit", "search", "run_in_terminal"]
+tools: ["read", "search"]
 handoffs:
   - agent: planner
     label: "1. Plan the feature"
