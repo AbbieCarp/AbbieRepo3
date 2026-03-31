@@ -19,10 +19,12 @@ idea, generate a comprehensive project plan in Markdown format.
 3. **Data model** - list the entities, their properties, and types.
 4. **File structure** - propose a directory layout under `src/`.
 5. **Implementation phases** - break the work into ordered milestones.
+6. **Error handling and validation** - define error handling conventions and input validation rules.
 
 ## Rules
 
 - Target Node.js 20+ with no external dependencies.
 - Use only built-in Node.js modules (fs, path, assert, etc.).
 - Keep the scope small enough for a workshop exercise.
+- Always include concrete error handling conventions and input validation rules.
 - Save the plan to `docs/project-plan.md`.
