@@ -23,6 +23,17 @@ export class Task {
     Object.assign(this, data);
   }
 
+  /** Return a new Task that is a copy of this one with a fresh ID and timestamps. */
+  clone() {
+    const copy = Object.create(Task.prototype);
+    Object.assign(copy, this.toObject(), {
+      id: randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    return copy;
+  }
+
   /** Return a plain copy with no class prototype methods attached. */
   toObject() {
     return {
