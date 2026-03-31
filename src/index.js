@@ -1,5 +1,6 @@
 import { TaskService } from './services/taskService.js';
 import { ValidationError, NotFoundError } from './domain/errors.js';
+import { colorizeStatus, colorizePriority } from './utils/colors.js';
 
 const service = new TaskService();
 
@@ -41,7 +42,7 @@ console.log('Created:', t4);
 console.log('\n=== LIST ALL TASKS ===');
 const all = service.listTasks();
 console.log(`Total tasks: ${all.length}`);
-all.forEach((t) => console.log(`  [${t.priority}] ${t.title} (${t.status})`));
+all.forEach((t) => console.log(`  [${colorizePriority(t.priority)}] ${t.title} (${colorizeStatus(t.status)})` ));
 
 // ── LIST (filter by status) ───────────────────────────────────────────────────
 
@@ -59,7 +60,7 @@ highPri.forEach((t) => console.log(`  ${t.title}`));
 
 console.log('\n=== SORT BY PRIORITY (asc) ===');
 const byPri = service.listTasks({ sortBy: 'priority', order: 'asc' });
-byPri.forEach((t) => console.log(`  [${t.priority}] ${t.title}`));
+byPri.forEach((t) => console.log(`  [${colorizePriority(t.priority)}] ${t.title}`));
 
 // ── LIST (sort by createdAt desc) ─────────────────────────────────────────────
 
